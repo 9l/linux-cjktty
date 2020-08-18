@@ -26,7 +26,6 @@ jobs:
           BUILD_PATH: /home/builder/linux-cjktty
         run: |
           sudo -u builder bash -c 'cd ~ && git clone https://github.com/9l/linux-cjktty && cd linux-cjktty && makepkg -s --needed --noconfirm'
-          ls -l $BUILD_PATH
 
       - name: Assemble artifact
         env:
