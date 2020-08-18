@@ -1,0 +1,11 @@
+--- a/drivers/tty/vt/vt.c	2020-05-25 23:52:19.744557144 +0800
++++ b/drivers/tty/vt/vt.c	2020-05-25 23:57:08.613584776 +0800
+@@ -1217,7 +1217,7 @@
+ 	if (new_cols == vc->vc_cols && new_rows == vc->vc_rows)
+ 		return 0;
+ 
+-	if (new_screen_size > (4 << 20))
++	if (new_screen_size > KMALLOC_MAX_SIZE)
+ 		return -EINVAL;
+ 
+ 	newscreen = kmalloc(new_screen_size * 2, GFP_USER);

@@ -1,0 +1,43 @@
+name: linux-cjktty kernel for arch linux
+
+on:
+  push:
+    tags: 5.*-utf8
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+      options: --privileged
+
+    steps:
+      - name: Initialization environment
+        run: |
+          pacman -Syyy
+          pacman -Syu --noconfirm
+          pacman -S --needed --noconfirm base-devel git sudo
+          useradd -m builder
+          passwd -d builder
+          printf 'builder ALL=(ALL) NOPASSWD: ALL\n' | tee -a /etc/sudoers
+
+      - name: Build linux-cjktty package
+        env:
+          BUILD_PATH: /home/builder/linux-cjktty
+        run: |
+          sudo -u builder bash -c 'cd ~ && git clone https://github.com/9l/linux-cjktty && cd linux-cjktty && makepkg -s --needed --noconfirm'
+          ls -l $BUILD_PATH
+
+      - name: Assemble artifact
+        env:
+          BUILD_PATH: /home/builder/linux-cjktty
+        run: |
+          rm -rf ./artifact/
+          mkdir -p ./artifact/
+          find $BUILD_PATH -name "linux-*.pkg.tar.*" | xargs -i mv -f {} ./artifact/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-cjktty-pkg
+          path: ./artifact
